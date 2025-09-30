@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { absolutePath } from "@/lib/url";
 
 export default function LoginPage() {
   const supabase = createClientComponentClient();
@@ -11,83 +10,70 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+
     setLoading(true);
-    setMessage("");
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setMessage(error.message);
-    } else {
-      // redirect to dashboard after successful login
-      router.push("/dashboard");
-    }
-
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
+
+    if (error) setError(error.message);
+    else router.replace("/dashboard");
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-lg shadow p-8">
-        <h1 className="text-2xl font-bold mb-6 text-center">Sign in</h1>
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+      <form onSubmit={handleLogin} className="bg-white w-full max-w-md rounded-lg shadow p-6 space-y-4">
+        <h1 className="text-xl font-semibold">Sign in</h1>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:ring-black sm:text-sm"
-            />
-          </div>
+        {error && <p className="text-red-600 text-sm">{error}</p>}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="Your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-black focus:ring-black sm:text-sm"
-            />
-          </div>
+        <label className="block">
+          <span className="text-sm">Email</span>
+          <input
+            type="email"
+            className="mt-1 w-full border rounded p-2"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </label>
 
+        <label className="block relative">
+          <span className="text-sm">Password</span>
+          <input
+            type={showPassword ? "text" : "password"}
+            className="mt-1 w-full border rounded p-2 pr-16"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-black text-white py-2 font-medium hover:bg-gray-800 disabled:opacity-50"
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-2 top-7 text-xs text-blue-600"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {showPassword ? "Hide" : "Show"}
           </button>
-        </form>
+        </label>
 
-        {message && (
-          <p className="mt-4 text-center text-sm text-red-600">{message}</p>
-        )}
+        <button
+          disabled={loading}
+          className="w-full bg-black text-white py-2 rounded"
+        >
+          {loading ? "Signing in…" : "Sign in"}
+        </button>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="text-sm text-center">
           Don’t have an account?{" "}
-          <a href="/signup" className="font-medium text-black hover:underline">
-            Sign up
-          </a>
+          <a href="/signup" className="text-blue-600 underline">Sign up</a>
         </p>
-      </div>
-    </div>
+      </form>
+    </main>
   );
 }

@@ -1,73 +1,107 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { useRouter } from "next/navigation";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export default function ResetPasswordPage() {
+  const supabase = createClientComponentClient();
+  const router = useRouter();
+
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+
+  const [showPw, setShowPw] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [isError, setIsError] = useState(false);
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  // Strong rule: 8+ chars, at least 1 letter, 1 number, 1 special char
+  const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setMessage("");
-    setIsError(false);
+    setError(null);
+    setMessage(null);
 
-    const { error } = await supabase.auth.updateUser({ password });
-
-    if (error) {
-      setIsError(true);
-      setMessage(error.message);
-    } else {
-      setMessage("Password updated successfully! Redirecting to Sign In...");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 3000);
+    if (!strongPassword.test(password)) {
+      setError("Password must be 8+ characters and include a number and a special character.");
+      return;
+    }
+    if (password !== confirm) {
+      setError("Passwords do not match.");
+      return;
     }
 
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-  };
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+    setMessage("Password updated. Redirecting to login…");
+    setTimeout(() => router.replace("/login"), 900);
+  }
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-purple-700 text-center">
-          Reset Password
-        </h2>
-        <form onSubmit={handleResetPassword} className="space-y-4">
+      <form onSubmit={handleSubmit} className="bg-white w-full max-w-md rounded-lg shadow p-6 space-y-4">
+        <h1 className="text-xl font-semibold">Set a new password</h1>
+
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {message && <p className="text-green-600 text-sm">{message}</p>}
+
+        <label className="block relative">
+          <span className="text-sm">New password</span>
           <input
-            type="password"
-            placeholder="New Password"
+            type={showPw ? "text" : "password"}
+            className="mt-1 w-full border rounded p-2 pr-16"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            aria-describedby="pw-help"
           />
           <button
-            type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition"
-            disabled={loading}
+            type="button"
+            onClick={() => setShowPw((s) => !s)}
+            className="absolute right-2 top-7 text-xs text-blue-600"
           >
-            {loading ? "Updating..." : "Update Password"}
+            {showPw ? "Hide" : "Show"}
           </button>
-        </form>
-        {message && (
-          <p
-            className={`mt-4 text-center text-sm ${
-              isError ? "text-red-600" : "text-green-600"
-            }`}
+        </label>
+
+        <p id="pw-help" className="text-xs text-gray-500 -mt-2">
+          Must be 8+ characters with at least one number and one special character.
+        </p>
+
+        <label className="block relative">
+          <span className="text-sm">Confirm new password</span>
+          <input
+            type={showConfirm ? "text" : "password"}
+            className="mt-1 w-full border rounded p-2 pr-16"
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirm((s) => !s)}
+            className="absolute right-2 top-7 text-xs text-blue-600"
           >
-            {message}
-          </p>
-        )}
-      </div>
+            {showConfirm ? "Hide" : "Show"}
+          </button>
+        </label>
+
+        <button disabled={loading} className="w-full bg-black text-white py-2 rounded">
+          {loading ? "Updating…" : "Update password"}
+        </button>
+      </form>
     </main>
   );
 }
