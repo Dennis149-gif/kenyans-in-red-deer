@@ -1,99 +1,59 @@
-// app/onboard/page.tsx
-"use client";
+-- 0) SAFETY: make required extensions available (already on in most projects)
+create extension if not exists "pgcrypto";
+create extension if not exists "uuid-ossp";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+-- 1) ADMINS TABLE (who can write announcements)
+create table if not exists public.admins (
+  user_id uuid primary key references auth.users(id) on delete cascade
+);
 
-export default function OnboardPage() {
-  const supabase = createClientComponentClient();
-  const router = useRouter();
+-- (Optional) RLS off on admins (it’s an internal allow-list)
+alter table public.admins disable row level security;
 
-  const [full_name, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [neighborhood, setNeighborhood] = useState("");
-  const [postal_code, setPostalCode] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+-- 2) ANNOUNCEMENTS TABLE
+create table if not exists public.announcements (
+  id          uuid primary key default gen_random_uuid(),
+  title       text not null,
+  body        text not null,
+  created_by  uuid not null references auth.users(id) on delete set null,
+  created_at  timestamptz not null default now()
+);
 
-  // Load current profile (if any)
-  useEffect(() => {
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/login");
-        return;
-      }
-      const { data } = await supabase
-        .from("profiles")
-        .select("full_name, phone, neighborhood, postal_code")
-        .eq("id", user.id)
-        .maybeSingle();
+-- 3) TURN ON RLS FOR ANNOUNCEMENTS
+alter table public.announcements enable row level security;
 
-      if (data) {
-        setFullName(data.full_name ?? "");
-        setPhone(data.phone ?? "");
-        setNeighborhood(data.neighborhood ?? "");
-        setPostalCode(data.postal_code ?? "");
-      }
-      setLoading(false);
-    })();
-  }, [router, supabase]);
+-- 4) (Re)CREATE POLICIES
+-- Clear existing policies if you re-run this script
+drop policy if exists "Announcements are viewable by everyone" on public.announcements;
+drop policy if exists "Only admins can write announcements"   on public.announcements;
 
-  async function save(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+-- Read: anyone (even logged out) can view
+create policy "Announcements are viewable by everyone"
+on public.announcements
+for select
+to public
+using (true);
 
-    await supabase.from("profiles").upsert({
-      id: user.id,
-      full_name,
-      phone,
-      neighborhood,
-      postal_code,
-      updated_at: new Date().toISOString(),
-    });
+-- Write: only users in admins can insert/update/delete
+create policy "Only admins can write announcements"
+on public.announcements
+for all
+using (
+  exists (
+    select 1 from public.admins a
+    where a.user_id = auth.uid()
+  )
+)
+with check (
+  exists (
+    select 1 from public.admins a
+    where a.user_id = auth.uid()
+  )
+);
 
-    router.replace("/dashboard");
-  }
-
-  if (loading) return <div className="p-6">Loading…</div>;
-
-  return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <form onSubmit={save} className="bg-white w-full max-w-md rounded-lg shadow p-6 space-y-4">
-        <h1 className="text-xl font-semibold">Complete your profile</h1>
-
-        <label className="block">
-          <span className="text-sm">Full name</span>
-          <input className="mt-1 w-full border rounded p-2"
-            value={full_name} onChange={e=>setFullName(e.target.value)} required />
-        </label>
-
-        <label className="block">
-          <span className="text-sm">Phone</span>
-          <input className="mt-1 w-full border rounded p-2"
-            value={phone} onChange={e=>setPhone(e.target.value)} required />
-        </label>
-
-        <label className="block">
-          <span className="text-sm">Neighborhood</span>
-          <input className="mt-1 w-full border rounded p-2"
-            value={neighborhood} onChange={e=>setNeighborhood(e.target.value)} />
-        </label>
-
-        <label className="block">
-          <span className="text-sm">Postal code</span>
-          <input className="mt-1 w-full border rounded p-2"
-            value={postal_code} onChange={e=>setPostalCode(e.target.value)} />
-        </label>
-
-        <button disabled={saving}
-          className="w-full bg-black text-white py-2 rounded">
-          {saving ? "Saving…" : "Save & Continue"}
-        </button>
-      </form>
-    </main>
-  );
-}
+-- 5) ENSURE YOUR ACCOUNT IS AN ADMIN (change email if needed)
+insert into public.admins (user_id)
+select id
+from auth.users
+where email = 'denniskipruto64@gmail.com'
+on conflict (user_id) do nothing;
