@@ -1,79 +1,89 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Banner from "../components/Banner";
+import JoinWhatsappModal from "../components/JoinWhatsappModal";
 
 export default function LoginPage() {
-  const supabase = createClientComponentClient();
   const router = useRouter();
-
+  const params = useSearchParams();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [pwd, setPwd] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [showJoin, setShowJoin] = useState(false);
+
+  // If user came from signup success → show WhatsApp modal
+  useEffect(() => {
+    if (params.get("welcome") === "1") {
+      setShowJoin(true);
+    }
+  }, [params]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
+    setBusy(true);
+    setErr("");
 
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    try {
+      // TODO: replace with your real login logic (Supabase/Auth/etc.)
+      // await auth.signIn({ email, password: pwd });
 
-    if (error) setError(error.message);
-    else router.replace("/dashboard");
+      // On success → go to dashboard (no WhatsApp button here)
+      router.push("/dashboard");
+    } catch (e: any) {
+      setErr(e?.message || "Login failed. Please try again.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <form onSubmit={handleLogin} className="bg-white w-full max-w-md rounded-lg shadow p-6 space-y-4">
-        <h1 className="text-xl font-semibold">Sign in</h1>
+    <main className="min-h-screen bg-black text-white">
+      <Banner />
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+      <div className="mx-auto max-w-md px-6 py-10">
+        <h1 className="mb-6 text-center text-3xl font-bold">Welcome Back</h1>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm">Email</label>
+            <input
+              type="email"
+              className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="you@email.com"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm">Password</label>
+            <input
+              type="password"
+              className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
+              value={pwd}
+              onChange={(e) => setPwd(e.target.value)}
+              required
+              placeholder="••••••••"
+            />
+          </div>
 
-        <label className="block">
-          <span className="text-sm">Email</span>
-          <input
-            type="email"
-            className="mt-1 w-full border rounded p-2"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-
-        <label className="block relative">
-          <span className="text-sm">Password</span>
-          <input
-            type={showPassword ? "text" : "password"}
-            className="mt-1 w-full border rounded p-2 pr-16"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          {/* REMOVE any WhatsApp button from Login */}
           <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-2 top-7 text-xs text-blue-600"
+            disabled={busy}
+            type="submit"
+            className="w-full rounded-md bg-yellow-500 px-4 py-3 font-semibold text-black hover:bg-yellow-400 disabled:opacity-60"
           >
-            {showPassword ? "Hide" : "Show"}
+            {busy ? "Signing In..." : "Login"}
           </button>
-        </label>
 
-        <button
-          disabled={loading}
-          className="w-full bg-black text-white py-2 rounded"
-        >
-          {loading ? "Signing in…" : "Sign in"}
-        </button>
+          {err && <p className="text-sm text-red-400">{err}</p>}
+        </form>
+      </div>
 
-        <p className="text-sm text-center">
-          Don’t have an account?{" "}
-          <a href="/signup" className="text-blue-600 underline">Sign up</a>
-        </p>
-      </form>
+      {/* WhatsApp modal shown only when coming from sign-up */}
+      <JoinWhatsappModal open={showJoin} onClose={() => setShowJoin(false)} />
     </main>
   );
 }

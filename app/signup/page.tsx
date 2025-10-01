@@ -2,128 +2,75 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { absolutePath } from "@/lib/url";
+import Banner from "../components/Banner";
 
 export default function SignupPage() {
-  const supabase = createClientComponentClient();
   const router = useRouter();
-
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  // Strong rule: 8+ chars, at least 1 letter, 1 number, 1 special char
-  const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+  const [pwd, setPwd] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setMessage(null);
+    setBusy(true);
+    setErr("");
 
-    if (!strongPassword.test(password)) {
-      setError("Password must be 8+ characters and include a number and a special character.");
-      return;
+    try {
+      // TODO: replace with your real sign-up logic (Supabase/Auth/etc.)
+      // await auth.signUp({ email, password: pwd });
+
+      // On success → send to login with success flag (no WhatsApp button here)
+      router.push("/login?welcome=1");
+    } catch (e: any) {
+      setErr(e?.message || "Failed to sign up. Please try again.");
+    } finally {
+      setBusy(false);
     }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: absolutePath("/auth/callback") },
-    });
-    setLoading(false);
-
-    if (error) setError(error.message);
-    else setMessage("Check your email for a confirmation link.");
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <form onSubmit={handleSignup} className="bg-white w-full max-w-md rounded-lg shadow p-6 space-y-4">
-        <h1 className="text-xl font-semibold">Create account</h1>
+    <main className="min-h-screen bg-black text-white">
+      <Banner />
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
-        {message && <p className="text-green-600 text-sm">{message}</p>}
+      <div className="mx-auto max-w-md px-6 py-10">
+        <h1 className="mb-6 text-center text-3xl font-bold">Create Your Account</h1>
+        <form onSubmit={handleSignup} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm">Email</label>
+            <input
+              type="email"
+              className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="you@email.com"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm">Password</label>
+            <input
+              type="password"
+              className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
+              value={pwd}
+              onChange={(e) => setPwd(e.target.value)}
+              required
+              placeholder="••••••••"
+            />
+          </div>
 
-        <label className="block">
-          <span className="text-sm">Email</span>
-          <input
-            type="email"
-            className="mt-1 w-full border rounded p-2"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-
-        <label className="block relative">
-          <span className="text-sm">Password</span>
-          <input
-            type={showPassword ? "text" : "password"}
-            className="mt-1 w-full border rounded p-2 pr-16"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            aria-describedby="pw-help"
-          />
+          {/* REMOVE any WhatsApp button from Sign Up */}
           <button
-            type="button"
-            onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-2 top-7 text-xs text-blue-600"
+            disabled={busy}
+            type="submit"
+            className="w-full rounded-md bg-yellow-500 px-4 py-3 font-semibold text-black hover:bg-yellow-400 disabled:opacity-60"
           >
-            {showPassword ? "Hide" : "Show"}
+            {busy ? "Creating Account..." : "Sign Up"}
           </button>
-        </label>
 
-        <p id="pw-help" className="text-xs text-gray-500 -mt-2">
-          Must be 8+ characters with at least one number and one special character.
-        </p>
-
-        <label className="block relative">
-          <span className="text-sm">Confirm password</span>
-          <input
-            type={showConfirm ? "text" : "password"}
-            className="mt-1 w-full border rounded p-2 pr-16"
-            autoComplete="new-password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          <button
-            type="button"
-            onClick={() => setShowConfirm((s) => !s)}
-            className="absolute right-2 top-7 text-xs text-blue-600"
-          >
-            {showConfirm ? "Hide" : "Show"}
-          </button>
-        </label>
-
-        <button
-          disabled={loading}
-          className="w-full bg-black text-white py-2 rounded"
-        >
-          {loading ? "Signing up…" : "Sign up"}
-        </button>
-
-        <p className="text-sm text-center">
-          Already have an account?{" "}
-          <a href="/login" className="text-blue-600 underline">Sign in</a>
-        </p>
-      </form>
+          {err && <p className="text-sm text-red-400">{err}</p>}
+        </form>
+      </div>
     </main>
   );
 }

@@ -1,163 +1,120 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
-type ProfileForm = {
-  full_name: string;
-  phone: string;
-  neighborhood: string;
-  postal_code: string;
-};
+import PageBackground from "../components/PageBackground";
 
 export default function OnboardPage() {
-  const supabase = createClientComponentClient();
-  const router = useRouter();
-
-  const [form, setForm] = useState<ProfileForm>({
-    full_name: '',
-    phone: '',
-    neighborhood: '',
-    postal_code: '',
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  // If user already has a profile, you can optionally prefill / skip
-  useEffect(() => {
-    (async () => {
-      const { data: userRes } = await supabase.auth.getUser();
-      const user = userRes?.user;
-      if (!user) return; // not logged in; let the submit handle redirect
-
-      const { data: existing } = await supabase
-        .from('profiles')
-        .select('full_name, phone, neighborhood, postal_code')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (existing) {
-        setForm({
-          full_name: existing.full_name ?? '',
-          phone: existing.phone ?? '',
-          neighborhood: existing.neighborhood ?? '',
-          postal_code: existing.postal_code ?? '',
-        });
-      }
-    })();
-  }, [supabase]);
-
-  const handleChange = (key: keyof ProfileForm) => 
-    (e: React.ChangeEvent<HTMLInputElement>) =>
-      setForm(prev => ({ ...prev, [key]: e.target.value }));
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMsg(null);
-    setLoading(true);
+    const data = new FormData(e.currentTarget);
+    const name = (data.get("name") as string) || "";
+    const email = (data.get("email") as string) || "";
+    const phone = (data.get("phone") as string) || "";
+    const whatsapp = (data.get("whatsapp") as string) || "";
+    const notes = (data.get("notes") as string) || "";
 
-    try {
-      const { data: userRes, error: userErr } = await supabase.auth.getUser();
-      if (userErr) throw userErr;
-      const user = userRes?.user;
-      if (!user) {
-        router.replace('/login');
-        return;
-      }
-
-      // Basic validation (tweak as you like)
-      if (!form.full_name.trim()) throw new Error('Please enter your full name.');
-      if (!form.phone.trim()) throw new Error('Please enter your phone.');
-      if (!form.neighborhood.trim()) throw new Error('Please enter your neighborhood.');
-      if (!form.postal_code.trim()) throw new Error('Please enter your postal code.');
-
-      // Upsert profile (requires RLS policy allowing owner to insert/update)
-      const { error } = await supabase
-        .from('profiles')
-        .upsert(
-          {
-            id: user.id,
-            full_name: form.full_name.trim(),
-            phone: form.phone.trim(),
-            neighborhood: form.neighborhood.trim(),
-            postal_code: form.postal_code.trim(),
-          },
-          { onConflict: 'id' }
-        );
-
-      if (error) throw error;
-
-      router.replace('/dashboard');
-    } catch (err: any) {
-      setErrorMsg(err?.message ?? 'Something went wrong.');
-    } finally {
-      setLoading(false);
-    }
+    const body =
+      `New KIRD Membership Registration%0A%0A` +
+      `Name: ${name}%0A` +
+      `Email: ${email}%0A` +
+      `Phone: ${phone}%0A` +
+      `WhatsApp: ${whatsapp}%0A%0A` +
+      `Notes:%0A${notes}`;
+    window.location.href = `mailto:denniskipruto64@gmail.com?subject=KIRD%20New%20Member&body=${body}`;
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-xl bg-white shadow rounded-lg p-6">
-        <h1 className="text-2xl font-semibold mb-6">Complete your profile</h1>
+    <main className="min-h-screen text-white">
+      <PageBackground dim={0.55} />
 
-        {errorMsg && (
-          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {errorMsg}
+      <section className="max-w-3xl mx-auto px-4 py-16">
+        <h1 className="text-4xl font-bold mb-2 text-center">Join KIRD</h1>
+        <p className="text-center text-neutral-200 mb-8">
+          Fill the form below to register. Annual membership fee is{" "}
+          <span className="text-green-400 font-semibold">$20</span>.
+        </p>
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 rounded-lg bg-black/60 border border-neutral-700 p-6"
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="block text-sm mb-1">Full name</label>
+              <input
+                name="name"
+                type="text"
+                required
+                className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="e.g., Dennis Kipruto"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Email</label>
+              <input
+                name="email"
+                type="email"
+                required
+                className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="you@example.com"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Phone</label>
+              <input
+                name="phone"
+                type="tel"
+                className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="+1 587-xxx-xxxx"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">WhatsApp number</label>
+              <input
+                name="whatsapp"
+                type="tel"
+                className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="+1 587-xxx-xxxx"
+              />
+            </div>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm mb-1">Full name</label>
-            <input
-              className="w-full rounded-md border px-3 py-2 outline-none focus:ring focus:ring-gray-200"
-              value={form.full_name}
-              onChange={handleChange('full_name')}
-              placeholder="Jane Doe"
+            <label className="block text-sm mb-1">Notes (optional)</label>
+            <textarea
+              name="notes"
+              rows={4}
+              className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
+              placeholder="Tell us anything we should know…"
             />
           </div>
 
-          <div>
-            <label className="block text-sm mb-1">Phone</label>
-            <input
-              className="w-full rounded-md border px-3 py-2 outline-none focus:ring focus:ring-gray-200"
-              value={form.phone}
-              onChange={handleChange('phone')}
-              placeholder="+1 403 555 0123"
-            />
+          <div className="flex items-center gap-2">
+            <input id="agree" type="checkbox" required className="h-4 w-4" />
+            <label htmlFor="agree" className="text-sm text-neutral-200">
+              I agree to the membership terms and the $20 annual fee.
+            </label>
           </div>
 
-          <div>
-            <label className="block text-sm mb-1">Neighborhood</label>
-            <input
-              className="w-full rounded-md border px-3 py-2 outline-none focus:ring focus:ring-gray-200"
-              value={form.neighborhood}
-              onChange={handleChange('neighborhood')}
-              placeholder="Clearview, Sunnybrook, etc."
-            />
+          <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+            <button
+              type="submit"
+              className="w-full sm:w-auto rounded-md bg-yellow-500 px-6 py-3 font-semibold text-black hover:bg-yellow-400"
+            >
+              Submit Registration
+            </button>
+            <a
+              href="/membership"
+              className="w-full sm:w-auto rounded-md border border-neutral-600 px-6 py-3 text-white hover:bg-white/10 text-center"
+            >
+              Back to Membership
+            </a>
           </div>
 
-          <div>
-            <label className="block text-sm mb-1">Postal code</label>
-            <input
-              className="w-full rounded-md border px-3 py-2 outline-none focus:ring focus:ring-gray-200"
-              value={form.postal_code}
-              onChange={handleChange('postal_code')}
-              placeholder="T4N 5E2"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-2 w-full rounded-md bg-black px-4 py-2 font-semibold text-white hover:opacity-90 disabled:opacity-60"
-          >
-            {loading ? 'Saving…' : 'Save & Continue'}
-          </button>
+          <p className="text-xs text-neutral-400 pt-2">
+            After submitting, your email app will open with your details; send it to complete registration.
+          </p>
         </form>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
