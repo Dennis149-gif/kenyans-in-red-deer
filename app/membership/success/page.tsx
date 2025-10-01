@@ -1,4 +1,4 @@
-import PageBackground from "../components/PageBackground";
+import PageBackground from "../../components/PageBackground";
 
 const WHATSAPP_INVITE = "https://chat.whatsapp.com/BdqDQUqKZ2C6er62j3PQKO";
 
