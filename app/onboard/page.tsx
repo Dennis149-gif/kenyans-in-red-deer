@@ -1,118 +1,88 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import PageBackground from "../components/PageBackground";
 
 export default function OnboardPage() {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const name = (data.get("name") as string) || "";
-    const email = (data.get("email") as string) || "";
-    const phone = (data.get("phone") as string) || "";
-    const whatsapp = (data.get("whatsapp") as string) || "";
-    const notes = (data.get("notes") as string) || "";
+  const router = useRouter();
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    whatsapp: "",
+    notes: "",
+  });
 
-    const body =
-      `New KIRD Membership Registration%0A%0A` +
-      `Name: ${name}%0A` +
-      `Email: ${email}%0A` +
-      `Phone: ${phone}%0A` +
-      `WhatsApp: ${whatsapp}%0A%0A` +
-      `Notes:%0A${notes}`;
-    window.location.href = `mailto:denniskipruto64@gmail.com?subject=KIRD%20New%20Member&body=${body}`;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Optionally still send email with form data here
+    // For now, just redirect to /success
+    router.push("/success");
   };
 
   return (
     <main className="min-h-screen text-white">
-      <PageBackground dim={0.55} />
+      <PageBackground dim={0.5} />
 
-      <section className="max-w-3xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold mb-2 text-center">Join KIRD</h1>
-        <p className="text-center text-neutral-200 mb-8">
-          Fill the form below to register. Annual membership fee is{" "}
-          <span className="text-green-400 font-semibold">$20</span>.
-        </p>
+      <section className="relative z-10 max-w-2xl mx-auto px-4 py-16">
+        <h1 className="text-3xl font-bold mb-6 text-center">Membership Registration</h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 rounded-lg bg-black/60 border border-neutral-700 p-6"
-        >
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="block text-sm mb-1">Full name</label>
-              <input
-                name="name"
-                type="text"
-                required
-                className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
-                placeholder="e.g., Dennis Kipruto"
-              />
-            </div>
-            <div>
-              <label className="block text-sm mb-1">Email</label>
-              <input
-                name="email"
-                type="email"
-                required
-                className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm mb-1">Phone</label>
-              <input
-                name="phone"
-                type="tel"
-                className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
-                placeholder="+1 587-xxx-xxxx"
-              />
-            </div>
-            <div>
-              <label className="block text-sm mb-1">WhatsApp number</label>
-              <input
-                name="whatsapp"
-                type="tel"
-                className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
-                placeholder="+1 587-xxx-xxxx"
-              />
-            </div>
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-4 bg-black/60 p-6 rounded-lg">
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded text-black"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded text-black"
+            required
+          />
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Phone Number"
+            value={form.phone}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded text-black"
+          />
+          <input
+            type="text"
+            name="whatsapp"
+            placeholder="WhatsApp Number"
+            value={form.whatsapp}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded text-black"
+          />
+          <textarea
+            name="notes"
+            placeholder="Additional Notes"
+            value={form.notes}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded text-black"
+            rows={3}
+          />
 
-          <div>
-            <label className="block text-sm mb-1">Notes (optional)</label>
-            <textarea
-              name="notes"
-              rows={4}
-              className="w-full rounded-md bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-500"
-              placeholder="Tell us anything we should know…"
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input id="agree" type="checkbox" required className="h-4 w-4" />
-            <label htmlFor="agree" className="text-sm text-neutral-200">
-              I agree to the membership terms and the $20 annual fee.
-            </label>
-          </div>
-
-          <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
-            <button
-              type="submit"
-              className="w-full sm:w-auto rounded-md bg-yellow-500 px-6 py-3 font-semibold text-black hover:bg-yellow-400"
-            >
-              Submit Registration
-            </button>
-            <a
-              href="/membership"
-              className="w-full sm:w-auto rounded-md border border-neutral-600 px-6 py-3 text-white hover:bg-white/10 text-center"
-            >
-              Back to Membership
-            </a>
-          </div>
-
-          <p className="text-xs text-neutral-400 pt-2">
-            After submitting, your email app will open with your details; send it to complete registration.
-          </p>
+          <button
+            type="submit"
+            className="w-full bg-yellow-500 text-black font-semibold py-2 rounded hover:bg-yellow-400"
+          >
+            Submit & Continue
+          </button>
         </form>
       </section>
     </main>
