@@ -1,29 +1,56 @@
 "use client";
 
-export const dynamic = "force-dynamic";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [form, setForm] = useState({ email: "", password: "" });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // 👉 Here you can add real backend check later
+    console.log("User logged in:", form);
+    router.push("/membership"); // after login, send to membership page
+  };
+
   return (
-    <main className="min-h-screen flex items-center justify-center bg-black text-white px-4">
-      <div className="w-full max-w-md rounded-lg border border-neutral-700 bg-neutral-900/60 p-6">
-        <h1 className="text-3xl font-bold mb-6 text-center">Login</h1>
-        <form className="space-y-4">
-          <div>
-            <label className="block text-sm mb-1">Email</label>
-            <input type="email" className="w-full rounded-md px-3 py-2 text-black" required />
-          </div>
-          <div>
-            <label className="block text-sm mb-1">Password</label>
-            <input type="password" className="w-full rounded-md px-3 py-2 text-black" required />
-          </div>
-          <button type="submit" className="w-full rounded-md bg-yellow-500 py-2 font-semibold text-black hover:bg-yellow-400">
-            Sign in
+    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <div className="w-full max-w-md bg-gray-900 p-8 rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold text-yellow-400 mb-6 text-center">
+          Sign In
+        </h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 rounded bg-gray-800 text-white focus:ring-2 focus:ring-yellow-400"
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 rounded bg-gray-800 text-white focus:ring-2 focus:ring-yellow-400"
+          />
+          <button
+            type="submit"
+            className="w-full bg-yellow-500 text-black font-semibold py-2 rounded hover:bg-yellow-400"
+          >
+            Sign In
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-neutral-400">
-          Don’t have an account? <a href="/signup" className="underline text-yellow-300">Sign up</a>
-        </p>
       </div>
-    </main>
+    </div>
   );
 }

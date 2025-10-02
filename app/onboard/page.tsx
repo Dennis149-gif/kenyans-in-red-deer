@@ -1,87 +1,50 @@
+// app/onboard/page.tsx
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import PageBackground from "../components/PageBackground";
 
 export default function OnboardPage() {
-  const router = useRouter();
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    whatsapp: "",
-    notes: "",
-  });
+  const [busy, setBusy] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    // Optionally still send email with form data here
-    // For now, just redirect to /success
-    router.push("/success");
-  };
+    setBusy(true);
+    // fake save for launch — replace with real API later
+    await new Promise((r) => setTimeout(r, 900));
+    window.location.href = "/membership/success";
+  }
 
   return (
-    <main className="min-h-screen text-white">
-      <PageBackground dim={0.5} />
+    <main className="relative min-h-screen text-white">
+      <PageBackground />
+      <section className="mx-auto max-w-xl px-4 py-16">
+        <h1 className="mb-6 text-3xl font-extrabold">Onboarding</h1>
 
-      <section className="relative z-10 max-w-2xl mx-auto px-4 py-16">
-        <h1 className="text-3xl font-bold mb-6 text-center">Membership Registration</h1>
-
-        <form onSubmit={handleSubmit} className="space-y-4 bg-black/60 p-6 rounded-lg">
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded text-black"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded text-black"
-            required
-          />
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Phone Number"
-            value={form.phone}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded text-black"
-          />
-          <input
-            type="text"
-            name="whatsapp"
-            placeholder="WhatsApp Number"
-            value={form.whatsapp}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded text-black"
-          />
-          <textarea
-            name="notes"
-            placeholder="Additional Notes"
-            value={form.notes}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded text-black"
-            rows={3}
-          />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm">Full Name</label>
+            <input className="w-full rounded-md px-3 py-2 text-black" required />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm">Email</label>
+            <input type="email" className="w-full rounded-md px-3 py-2 text-black" required />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm">Phone / WhatsApp</label>
+            <input className="w-full rounded-md px-3 py-2 text-black" />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm">Notes (optional)</label>
+            <textarea rows={4} className="w-full rounded-md px-3 py-2 text-black" />
+          </div>
 
           <button
             type="submit"
-            className="w-full bg-yellow-500 text-black font-semibold py-2 rounded hover:bg-yellow-400"
+            disabled={busy}
+            className="w-full rounded-md bg-yellow-400 px-5 py-2 font-semibold text-black hover:bg-yellow-300 disabled:opacity-60"
           >
-            Submit & Continue
+            {busy ? "Submitting…" : "Submit & Continue"}
           </button>
         </form>
       </section>

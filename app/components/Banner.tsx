@@ -1,15 +1,11 @@
+// app/components/Banner.tsx
 export default function Banner() {
   return (
-    <div className="w-full">
-      {/* Thin color strip using Kenyan colors */}
-      <div className="h-1 w-full bg-gradient-to-r from-black via-red-600 to-green-600" />
-      {/* Title bar */}
-      <div className="bg-white text-black text-center py-3 font-extrabold tracking-wide">
-        <span className="px-2 py-1 rounded bg-black text-white">Official Website</span>{" "}
-        Of <span className="text-red-600">Kenyans</span> <span className="text-black">In</span>{" "}
-        <span className="text-green-600">Red Deer</span>
+    <div className="mx-auto w-full max-w-5xl px-4 pt-6 sm:px-6 lg:px-8">
+      <div className="flex items-center gap-3">
+        <img src="/kird-logo.png" alt="KIRD" className="h-10 w-10 rounded-full" />
+        <div className="text-yellow-400 font-bold tracking-wide">KIRD</div>
       </div>
-      <div className="h-1 w-full bg-gradient-to-r from-green-600 via-red-600 to-black" />
     </div>
   );
 }
