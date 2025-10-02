@@ -1,23 +1,23 @@
 // app/components/PageBackground.tsx
+// Layered background: flags image + your photo + dark gradient for readability.
 export default function PageBackground() {
   return (
-    <div className="absolute inset-0 -z-10">
-      {/* Flags background */}
+    <div className="pointer-events-none absolute inset-0 -z-10">
+      {/* Flags layer */}
       <img
         src="/flags-bg.png"
-        alt="Kenya & Canada flags background"
-        className="h-full w-full object-cover"
-        style={{ opacity: 0.55 }}
+        alt="Kenya & Canada flags"
+        className="absolute inset-0 h-full w-full object-cover opacity-40"
       />
-      {/* Centered KIRD watermark */}
+      {/* Portrait layer (centered, subtle) */}
       <img
-        src="/kird-logo.png"
-        alt="Kenyans in Red Deer watermark"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 select-none"
-        style={{ opacity: 0.08 }}
+        src="/dennis.jpg"
+        alt="Community member"
+        className="absolute inset-0 m-auto h-[75vh] max-w-none object-contain opacity-25 mix-blend-lighten"
+        style={{ filter: "grayscale(10%) contrast(1.05)" }}
       />
-      {/* dark veil for readability */}
-      <div className="absolute inset-0 bg-black/60" />
+      {/* Dark gradient mask to keep text readable */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/70" />
     </div>
   );
 }

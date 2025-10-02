@@ -1,72 +1,53 @@
+// app/page.tsx
+import PageBackground from "./components/PageBackground";
+
+export const metadata = {
+  title: "Kenyans in Red Deer",
+  description:
+    "Official page of Kenyans in Red Deer — membership, manifesto, contacts, and WhatsApp group.",
+};
+
 export default function HomePage() {
   return (
-    <main className="bg-black text-white min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-[85vh] w-full">
-        {/* Background image */}
-        <img
-          src="/flags-bg.png"
-          alt="Kenya and Canada flags"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+    <main className="relative min-h-[88vh] flex items-center justify-center overflow-hidden">
+      <PageBackground />
 
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/50" />
+      <section className="relative z-10 mx-auto max-w-4xl px-4 text-center">
+        {/* Logo (optional; requires /public/kird-logo.png) */}
 
-        {/* Foreground content */}
-        <div className="relative z-10 flex h-full flex-col items-center justify-center text-center px-4">
-          <img
-            src="/kird-logo.png"
-            alt="KIRD Logo"
-            className="h-24 w-24 rounded-full mb-4"
-          />
-          <img
-            src="/dennis.jpg"
-            alt="Dennis Kipruto"
-            className="h-48 w-48 rounded-lg border-4 border-white/20 shadow-xl"
-          />
-          <h1 className="mt-6 text-4xl font-extrabold text-yellow-400 uppercase">
-            Official Page of Kenyans in Red Deer
-          </h1>
-          <p className="mt-4 text-2xl font-bold text-[#FFD700]">
-            Your Voice, Our Future{" "}
-            <span className="ml-2 text-[#00A651]">✔️</span>
-          </p>
+        {/* Big gold headline */}
+        <p className="text-yellow-400 text-sm md:text-base tracking-[0.25em] uppercase font-bold">
+          Official Page of the Kenyans in Red Deer
+        </p>
+
+        <h1 className="mt-3 text-4xl md:text-5xl font-extrabold text-white drop-shadow">
+          Kenyans in Red Deer
+        </h1>
+
+        {/* Strong message */}
+        <p className="mt-5 text-neutral-200 leading-relaxed md:text-lg">
+          We are building unity, opportunity, and a stronger future together in
+          Red Deer. This site is our digital home — where we welcome new members,
+          organize events, support one another through the benevolent fund, and
+          connect on our official WhatsApp group. <span className="text-yellow-300 font-semibold">This is the face of our community online, and we will keep improving it until it fully represents Kenyans in Red Deer.</span>
+        </p>
+
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
           <a
             href="/manifesto"
-            className="mt-6 inline-block rounded-md bg-yellow-500 px-6 py-3 font-semibold text-black hover:bg-yellow-400"
+            className="px-6 py-3 bg-yellow-500 text-black font-semibold rounded-md hover:bg-yellow-400 transition"
           >
-            Read Full Manifesto
+            Our Manifesto
           </a>
-        </div>
-      </section>
-
-      {/* Intro Section */}
-      <section className="max-w-4xl mx-auto py-16 px-6 text-center">
-        <h2 className="text-3xl font-bold text-yellow-400 mb-6">
-          Welcome to Kenyans in Red Deer
-        </h2>
-        <p className="text-lg leading-relaxed text-gray-300">
-          This is the <span className="text-yellow-400 font-semibold">official digital home</span> 
-          of the Kenyans in Red Deer community. More than a website, it is our 
-          identity, our connection point, and our voice to the wider world.  
-        </p>
-        <p className="mt-4 text-lg leading-relaxed text-gray-300">
-          Here, you can register as a member, join our benevolent fund, learn
-          about upcoming cultural events, and follow leadership updates. This
-          website will continue to grow until it becomes the true face of Kenyans
-          in Red Deer, both in Canada and across the globe.
-        </p>
-        <div className="mt-8 flex justify-center gap-6">
           <a
             href="/membership"
-            className="rounded-md bg-green-600 px-6 py-3 font-semibold hover:bg-green-500"
+            className="px-6 py-3 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 transition"
           >
-            Join Membership
+            Become a Member
           </a>
           <a
             href="/contact"
-            className="rounded-md bg-gray-700 px-6 py-3 font-semibold hover:bg-gray-600"
+            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition"
           >
             Contact Us
           </a>
