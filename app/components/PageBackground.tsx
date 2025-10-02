@@ -1,17 +1,12 @@
-export default function PageBackground({ dim = 0.5 }: { dim?: number }) {
+export default function PageBackground() {
   return (
-    <>
+    <div className="absolute inset-0 z-0">
       <img
         src="/flags-bg.png"
-        alt=""
-        aria-hidden="true"
-        className="fixed inset-0 -z-20 h-full w-full object-cover"
+        alt="Kenya and Canada Flags Background"
+        className="w-full h-full object-cover"
       />
-      <div
-        className="fixed inset-0 -z-10"
-        style={{ backgroundColor: `rgba(0,0,0,${dim})` }}
-        aria-hidden="true"
-      />
-    </>
+      <div className="absolute inset-0 bg-black bg-opacity-60" />
+    </div>
   );
 }
