@@ -1,7 +1,6 @@
-// app/auth/callback/route.ts
-export async function GET(req: Request) {
-  const origin = new URL(req.url).origin;
-  const url = new URL('/membership', origin);
-  // Later: parse tokens from req.url if using a real provider
-  return Response.redirect(url, 302);
+import { NextResponse } from "next/server";
+
+export async function GET(request: Request) {
+  // 👇 after login/signup, redirect users to homepage
+  return NextResponse.redirect(new URL("/", request.url));
 }
