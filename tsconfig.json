@@ -1,34 +1,38 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    /* Modern, Next.js-friendly defaults */
+    "target": "ES2020",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "jsx": "preserve",
+    "noEmit": true,
     "incremental": true,
+    /* Type safety & DX */
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    /* Path alias so "@/..." points to app/ */
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./*"
+        "./app/*"
       ]
     },
+    /* Next.js TS plugin (enables special rules & hints) */
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "esModuleInterop": true
   },
   "include": [
     "next-env.d.ts",
