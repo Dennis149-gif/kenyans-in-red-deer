@@ -4,9 +4,8 @@ import NavBar from "@/components/NavBar";
 
 export const metadata: Metadata = {
   title: "Kenyans in Red Deer",
-  description: "Official page for the Kenyans in Red Deer community.",
-  // make sure phones scale correctly
-  viewport: "width=device-width, initial-scale=1",
+  description: "Official website for the Kenyans in Red Deer community.",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
