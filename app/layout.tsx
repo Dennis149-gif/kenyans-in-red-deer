@@ -1,17 +1,20 @@
 import "./globals.css";
-import Navbar from "./components/Navbar";
+import type { Metadata } from "next";
+import NavBar from "@/components/NavBar";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Kenyans in Red Deer",
-  description: "Official Page of Kenyans in Red Deer Community",
+  description: "Official page for the Kenyans in Red Deer community.",
+  // make sure phones scale correctly
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="bg-black text-white">
-        <Navbar />
-        <div className="pt-20">{children}</div>
+    <html lang="en" className="h-full">
+      <body className="min-h-full bg-black text-zinc-100 antialiased">
+        <NavBar />
+        {children}
       </body>
     </html>
   );
