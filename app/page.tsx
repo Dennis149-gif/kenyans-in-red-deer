@@ -1,58 +1,39 @@
 // app/page.tsx
-import Image from "next/image";
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <main className="relative flex min-h-[80vh] flex-col items-center justify-center bg-gray-50 text-center p-6">
+    <main className="relative min-h-[90vh] overflow-hidden">
       {/* Background flags */}
-      <div className="absolute inset-0 -z-10">
-        <Image
-          src="/flags-bg.png"
-          alt="Kenya and Canada flags background"
-          fill
-          className="object-cover opacity-20"
-          priority
-        />
-      </div>
-
-      {/* Logo */}
-      <Image
-        src="/kird-logo.png"
-        alt="Kenyans in Red Deer Logo"
-        width={120}
-        height={120}
-        className="mb-6"
-        priority
+      <img
+        src="/flags-bg.png"
+        alt="Kenya & Canada flags"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-40 -z-10"
       />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/60 -z-10" />
 
-      <h1 className="text-4xl font-extrabold text-green-800">
-        Kenyans in Red Deer
-      </h1>
-      <p className="mt-4 max-w-xl text-gray-700">
-        A united community of Kenyans in Red Deer. Together we support,
-        grow, and build a stronger future.
-      </p>
+      {/* Foreground content */}
+      <section className="relative z-10 flex flex-col items-center justify-center text-center gap-6 px-4 py-24">
+        <img src="/kird-logo.png" alt="KIRD Logo" className="h-20 w-20 rounded-full" />
+        <img src="/dennis.jpg" alt="Dennis Kirputo" className="h-24 w-24 rounded-full object-cover" />
 
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <a
-          href="/manifesto"
-          className="rounded-md bg-green-600 px-5 py-2.5 text-white font-semibold hover:bg-green-700"
-        >
-          Manifesto
-        </a>
-        <a
-          href="/membership"
-          className="rounded-md bg-blue-600 px-5 py-2.5 text-white font-semibold hover:bg-blue-700"
-        >
-          Membership
-        </a>
-        <a
-          href="/contact"
-          className="rounded-md bg-gray-900 px-5 py-2.5 text-white font-semibold hover:bg-gray-800"
-        >
-          Contact
-        </a>
-      </div>
+        {/* <<< CHANGE IS HERE >>> */}
+        <h1 className="text-4xl md:text-5xl font-extrabold text-[#FFD700] drop-shadow">
+          Official Page of the Kenyans in Red Deer
+        </h1>
+
+        <p className="max-w-2xl text-neutral-200">
+          Your voice, our future. Become a member, support community programs,
+          and connect with fellow Kenyans in Red Deer.
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <a href="/signup" className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700">Sign Up</a>
+          <a href="/login" className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">Sign In</a>
+          <a href="/membership" className="px-6 py-3 bg-neutral-800 text-white rounded-md hover:bg-neutral-700">
+            Join WhatsApp Group
+          </a>
+        </div>
+      </section>
     </main>
   );
 }
