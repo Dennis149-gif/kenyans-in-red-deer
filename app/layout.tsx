@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import NavBar from "@/components/NavBar";
+import NavBar from "./components/Navbar";
 
 export const metadata: Metadata = {
   title: "Kenyans in Red Deer",

@@ -7,9 +7,7 @@ export default function HomePage() {
     <main className="min-h-dvh bg-black text-zinc-100">
       <Navbar />
 
-      {/* hero */}
       <section className="mx-auto flex max-w-6xl flex-col items-center px-4 pb-20 pt-10 sm:pt-14">
-        {/* top logos */}
         <div className="flex flex-col items-center gap-6">
           <Image
             src="/kird-logo.png"
@@ -28,7 +26,6 @@ export default function HomePage() {
           />
         </div>
 
-        {/* headline & copy */}
         <h1 className="mt-8 text-center font-extrabold leading-tight text-yellow-400">
           <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
             Official Website of the
@@ -43,7 +40,6 @@ export default function HomePage() {
           fellow Kenyans in Red Deer.
         </p>
 
-        {/* actions */}
         <div className="mt-6 flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link
             href="/signup"
@@ -51,14 +47,12 @@ export default function HomePage() {
           >
             Sign Up
           </Link>
-
           <Link
             href="/login"
             className="w-full max-w-[260px] rounded-md bg-blue-600 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto"
           >
             Sign In
           </Link>
-
           <Link
             href={process.env.WHATSAPP_INVITE_URL || "#"}
             className="w-full max-w-[260px] rounded-md border border-zinc-700 px-5 py-3 text-center text-sm font-semibold text-zinc-100 hover:border-zinc-500 sm:w-auto"
